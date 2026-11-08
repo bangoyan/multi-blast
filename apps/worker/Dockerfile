@@ -26,4 +26,4 @@ COPY --from=base /app/node_modules ./node_modules
 COPY --from=base /app/packages/shared ./packages/shared
 COPY --from=base /app/apps/worker ./apps/worker
 
-CMD ["node", "apps/worker/dist/index.js"]
+CMD ["npx", "tsx", "apps/worker/src/index.ts"]
