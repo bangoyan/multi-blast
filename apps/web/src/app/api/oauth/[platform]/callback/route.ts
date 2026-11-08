@@ -79,20 +79,42 @@ export async function GET(
         const longTokenData = await longTokenRes.json()
         const userAccessToken = longTokenData.access_token || tokenData.access_token
 
-        // 3. Fetch user accounts / pages
+        // 3. Fetch user accounts / pages with detailed fields
         const pagesRes = await fetch(
-          `https://graph.facebook.com/v19.0/me/accounts?fields=id,name,access_token,instagram_business_account{id,username,name}&access_token=${userAccessToken}`
+          `https://graph.facebook.com/v19.0/me/accounts?fields=id,name,category,access_token,instagram_business_account{id,username,name,profile_picture_url,followers_count}&access_token=${userAccessToken}`
         )
         const pagesData = await pagesRes.json()
 
         if (platform === 'instagram') {
-          // Look for Instagram business account attached to pages
-          const pageWithIg = pagesData.data?.find(
-            (p: any) => p.instagram_business_account?.id
-          )
+          const pages = pagesData.data || []
+          let connectedIgCount = 0
 
-          if (!pageWithIg) {
-            // If no business account attached, save user account as fallback
+          // Loop all pages to link every attached Instagram Business account
+          for (const page of pages) {
+            if (page.instagram_business_account?.id) {
+              const ig = page.instagram_business_account
+              await supabase.from('social_accounts').upsert(
+                {
+                  user_id: user.id,
+                  platform: 'instagram',
+                  platform_user_id: ig.id,
+                  username: ig.username || ig.name || `instagram_${ig.id}`,
+                  access_token: page.access_token || userAccessToken,
+                  metadata: {
+                    page_id: page.id,
+                    page_name: page.name,
+                    profile_picture_url: ig.profile_picture_url,
+                    followers_count: ig.followers_count || 0,
+                  },
+                },
+                { onConflict: 'user_id,platform,platform_user_id' }
+              )
+              connectedIgCount++
+            }
+          }
+
+          // Fallback if no business account attached to any page
+          if (connectedIgCount === 0) {
             const meRes = await fetch(
               `https://graph.facebook.com/v19.0/me?fields=id,name&access_token=${userAccessToken}`
             )
@@ -104,36 +126,33 @@ export async function GET(
                 platform_user_id: me.id,
                 username: me.name?.replace(/\s+/g, '_').toLowerCase() || 'instagram_user',
                 access_token: userAccessToken,
-              },
-              { onConflict: 'user_id,platform,platform_user_id' }
-            )
-          } else {
-            const ig = pageWithIg.instagram_business_account
-            await supabase.from('social_accounts').upsert(
-              {
-                user_id: user.id,
-                platform: 'instagram',
-                platform_user_id: ig.id,
-                username: ig.username || ig.name,
-                access_token: pageWithIg.access_token, // Page token has posting permissions
+                metadata: {
+                  followers_count: 0,
+                },
               },
               { onConflict: 'user_id,platform,platform_user_id' }
             )
           }
         } else {
-          // Facebook: use primary page or user profile
-          const primaryPage = pagesData.data?.[0]
-          if (primaryPage) {
-            await supabase.from('social_accounts').upsert(
-              {
-                user_id: user.id,
-                platform: 'facebook',
-                platform_user_id: primaryPage.id,
-                username: primaryPage.name,
-                access_token: primaryPage.access_token,
-              },
-              { onConflict: 'user_id,platform,platform_user_id' }
-            )
+          // Facebook: Link all available Pages
+          const pages = pagesData.data || []
+          if (pages.length > 0) {
+            for (const page of pages) {
+              await supabase.from('social_accounts').upsert(
+                {
+                  user_id: user.id,
+                  platform: 'facebook',
+                  platform_user_id: page.id,
+                  username: page.name,
+                  access_token: page.access_token,
+                  metadata: {
+                    page_id: page.id,
+                    category: page.category || 'Page',
+                  },
+                },
+                { onConflict: 'user_id,platform,platform_user_id' }
+              )
+            }
           } else {
             const meRes = await fetch(
               `https://graph.facebook.com/v19.0/me?fields=id,name&access_token=${userAccessToken}`
@@ -231,18 +250,26 @@ export async function GET(
         // Fetch channel info
         let channelId = ''
         let channelTitle = 'YouTube Channel'
+        let channelMeta: Record<string, any> = {}
 
         try {
           const chRes = await fetch(
-            'https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true',
+            'https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&mine=true',
             {
               headers: { Authorization: `Bearer ${access_token}` },
             }
           )
           const chData = await chRes.json()
           if (chData.items && chData.items.length > 0) {
-            channelId = chData.items[0].id
-            channelTitle = chData.items[0].snippet?.title || 'YouTube Channel'
+            const ch = chData.items[0]
+            channelId = ch.id
+            channelTitle = ch.snippet?.title || 'YouTube Channel'
+            channelMeta = {
+              thumbnail: ch.snippet?.thumbnails?.default?.url,
+              subscriber_count: ch.statistics?.subscriberCount || '0',
+              view_count: ch.statistics?.viewCount || '0',
+              video_count: ch.statistics?.videoCount || '0',
+            }
           }
         } catch {
           // Fallback to userinfo
@@ -255,6 +282,9 @@ export async function GET(
           const profile = await profileRes.json()
           channelId = profile.id
           channelTitle = profile.name || 'YouTube User'
+          channelMeta = {
+            thumbnail: profile.picture,
+          }
         }
 
         const expiresAt = expires_in ? new Date(Date.now() + expires_in * 1000).toISOString() : null
@@ -268,6 +298,7 @@ export async function GET(
             access_token,
             refresh_token,
             token_expires_at: expiresAt,
+            metadata: channelMeta,
           },
           { onConflict: 'user_id,platform,platform_user_id' }
         )

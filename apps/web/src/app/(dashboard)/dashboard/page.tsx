@@ -29,7 +29,7 @@ export default async function DashboardPage() {
     supabase.from('comment_rules').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_active', true),
     supabase.from('dm_triggers').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_active', true),
     supabase.from('dm_logs').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'sent'),
-    supabase.from('social_accounts').select('id, platform, username').eq('user_id', user.id),
+    supabase.from('social_accounts').select('id, platform, username, metadata').eq('user_id', user.id),
   ])
 
   const connectedAccounts = socialAccountsRes.data || []
@@ -38,10 +38,20 @@ export default async function DashboardPage() {
   const activeRules = rulesRes.count ?? 0
   const dmsSent = dmLogsRes.count ?? 0
 
+  // Calculate total followers across all linked social channels
+  const totalFollowers = connectedAccounts.reduce((sum: number, acc: any) => {
+    const count = Number(acc.metadata?.followers_count || acc.metadata?.subscriber_count || 0)
+    return sum + (isNaN(count) ? 0 : count)
+  }, 0)
+
   // Display metrics (combining live database numbers with styled baseline)
   const revenueDisplay = totalPosts > 0 ? (totalPosts * 14250).toLocaleString() : '85,500'
   const ordersDisplay = dmsSent > 0 ? (dmsSent * 12).toLocaleString() : '1,000'
-  const customersDisplay = (activeRules + scheduledCount) > 0 ? ((activeRules + scheduledCount) * 50).toLocaleString() : '300'
+  const customersDisplay = totalFollowers > 0
+    ? totalFollowers.toLocaleString()
+    : (activeRules + scheduledCount) > 0
+      ? ((activeRules + scheduledCount) * 50).toLocaleString()
+      : '300'
 
   return (
     <div className="space-y-6 pb-8">
@@ -480,8 +490,8 @@ export default async function DashboardPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {(['instagram', 'tiktok', 'facebook', 'youtube'] as SocialPlatform[]).map(platform => {
                 const meta = SOCIAL_META[platform]
-                const acc = connectedAccounts.find((a: any) => a.platform === platform)
-                const isConn = !!acc
+                const platformAccounts = connectedAccounts.filter((a: any) => a.platform === platform)
+                const isConn = platformAccounts.length > 0
 
                 return (
                   <div
@@ -503,7 +513,7 @@ export default async function DashboardPage() {
                             : 'bg-gray-100 text-gray-500 dark:bg-white/10 dark:text-gray-400'
                         }`}
                       >
-                        {isConn ? '● Active' : '○ Standby'}
+                        {isConn ? `● ${platformAccounts.length} Active` : '○ Standby'}
                       </span>
                     </div>
 
@@ -512,14 +522,16 @@ export default async function DashboardPage() {
                         {meta.name}
                       </p>
                       <p className="text-[11px] font-medium text-gray-500 truncate mt-0.5">
-                        {isConn ? `@${acc.username}` : 'Not connected'}
+                        {isConn
+                          ? `@${platformAccounts[0].username}${platformAccounts.length > 1 ? ` +${platformAccounts.length - 1} more` : ''}`
+                          : 'Not connected'}
                       </p>
                     </div>
 
                     <div className="mt-3 pt-2.5 border-t border-gray-100 dark:border-white/5 flex items-center justify-between text-[11px]">
                       <span className="text-gray-400">Blast Ready</span>
                       <span className="font-bold text-gray-700 dark:text-gray-300">
-                        {isConn ? '100%' : '0%'}
+                        {isConn ? `${platformAccounts.length * 25 > 100 ? 100 : platformAccounts.length * 25}%` : '0%'}
                       </span>
                     </div>
                   </div>

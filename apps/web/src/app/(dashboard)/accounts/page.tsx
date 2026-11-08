@@ -93,11 +93,14 @@ function AccountsContent() {
     setLoading(true)
     setMessage(null)
 
+    const existingCount = accounts.filter((a: any) => a.platform === p).length
+    const suffix = existingCount > 0 ? `_${existingCount + 1}` : ''
+
     const defaultNames: Record<SocialPlatform, string> = {
-      instagram: 'brand_multiblast',
-      tiktok: 'creator_multiblast',
-      facebook: 'MultiBlast Marketing HQ',
-      youtube: 'MultiBlast Omnichannel',
+      instagram: `brand_multiblast${suffix}`,
+      tiktok: `creator_multiblast${suffix}`,
+      facebook: `MultiBlast Marketing HQ${suffix ? ' #' + (existingCount + 1) : ''}`,
+      youtube: `MultiBlast Omnichannel${suffix ? ' #' + (existingCount + 1) : ''}`,
     }
 
     try {
@@ -107,13 +110,13 @@ function AccountsContent() {
         body: JSON.stringify({
           platform: p,
           username: defaultNames[p],
-          platformUserId: `${p}_uid_${Date.now()}`,
+          platformUserId: `${p}_uid_${Date.now()}_${existingCount + 1}`,
           accessToken: `token_demo_${p}_${Math.random().toString(36).substring(2)}`,
         }),
       })
 
       if (res.ok) {
-        setMessage({ type: 'success', text: `${SOCIAL_META[p].name} successfully connected!` })
+        setMessage({ type: 'success', text: `${SOCIAL_META[p].name} account #${existingCount + 1} connected!` })
         setActivePlatformModal(null)
         fetchAccounts()
       } else {
@@ -225,8 +228,8 @@ function AccountsContent() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
         {PLATFORMS.map(platform => {
           const meta = SOCIAL_META[platform]
-          const connectedAccount = accounts.find((a: any) => a.platform === platform)
-          const isConnected = !!connectedAccount
+          const platformAccounts = accounts.filter((a: any) => a.platform === platform)
+          const isConnected = platformAccounts.length > 0
 
           return (
             <div
@@ -249,34 +252,69 @@ function AccountsContent() {
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
                       {meta.name}
                       {isConnected && (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
-                          <CheckCircle2 className="h-3 w-3" /> Connected
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                          <CheckCircle2 className="h-3 w-3" /> {platformAccounts.length} Connected
                         </span>
                       )}
                     </h3>
                     <p className="text-xs text-gray-500 font-medium mt-0.5">
-                      {isConnected ? `@${connectedAccount.username}` : 'Ready for OAuth connection'}
+                      {isConnected
+                        ? `${platformAccounts.length} account${platformAccounts.length > 1 ? 's' : ''} linked to this channel`
+                        : 'Ready for 1-Click OAuth connection'}
                     </p>
                   </div>
                 </div>
-
-                {isConnected && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDelete(connectedAccount.id)}
-                    className="text-gray-400 hover:text-rose-600 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/30"
-                    title="Disconnect account"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                )}
               </div>
 
+              {/* Connected Accounts List */}
+              {isConnected && (
+                <div className="mt-4 space-y-2">
+                  <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                    Linked Accounts
+                  </p>
+                  <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
+                    {platformAccounts.map((acc: any) => {
+                      const followers = acc.metadata?.followers_count || acc.metadata?.subscriber_count
+                      return (
+                        <div
+                          key={acc.id}
+                          className="flex items-center justify-between p-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 hover:border-gray-200 transition-colors"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="h-7 w-7 rounded-xl bg-gray-200 dark:bg-white/10 flex items-center justify-center font-bold text-xs shrink-0">
+                              {acc.username.charAt(0).toUpperCase()}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-xs font-bold text-gray-900 dark:text-white truncate">
+                                @{acc.username}
+                              </p>
+                              <p className="text-[10px] text-gray-500 truncate">
+                                {followers ? `${Number(followers).toLocaleString()} followers • ` : ''}ID: {acc.platform_user_id.slice(-8)}
+                              </p>
+                            </div>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(acc.id)}
+                            className="h-7 w-7 text-gray-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/30 shrink-0"
+                            title="Disconnect account"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* Description */}
-              <p className="text-xs text-gray-600 dark:text-gray-400 mt-4 leading-relaxed font-normal">
-                {meta.description}
-              </p>
+              {!isConnected && (
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-4 leading-relaxed font-normal">
+                  {meta.description}
+                </p>
+              )}
 
               {/* Capabilities Pills */}
               <div className="mt-4 flex flex-wrap gap-1.5">
@@ -292,64 +330,39 @@ function AccountsContent() {
 
               {/* Actions */}
               <div className="mt-6 pt-4 border-t border-gray-100 dark:border-white/5 flex flex-col gap-2.5">
-                {isConnected ? (
-                  <div className="flex items-center justify-between w-full">
-                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                      ● Live Sync Active
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <a href={`/api/oauth/${platform}`}>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="rounded-xl text-xs font-bold"
-                        >
-                          Re-authorize
-                        </Button>
-                      </a>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <a href={`/api/oauth/${platform}`} className="flex-1">
                       <Button
-                        variant="ghost"
                         size="sm"
-                        onClick={() => openConnectModal(platform)}
-                        className="rounded-xl text-xs font-bold text-gray-500"
+                        className="w-full rounded-xl bg-black dark:bg-white text-white dark:text-black hover:bg-black/80 font-bold text-xs shadow-sm"
                       >
-                        Edit Token
+                        <Key className="h-3.5 w-3.5 mr-1.5" />
+                        {isConnected ? `+ Add Another ${meta.name} Account` : 'Connect via OAuth'}
                       </Button>
-                    </div>
+                    </a>
+                    <Button
+                      onClick={() => handleQuickConnect(platform)}
+                      disabled={loading}
+                      size="sm"
+                      className="rounded-xl bg-[#D8F85D] hover:bg-[#CCF046] text-[#18181B] font-bold text-xs shadow-sm"
+                      title="Quick connect demo account for testing"
+                    >
+                      <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+                      1-Click Demo
+                    </Button>
                   </div>
-                ) : (
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <a href={`/api/oauth/${platform}`} className="flex-1">
-                        <Button
-                          size="sm"
-                          className="w-full rounded-xl bg-black dark:bg-white text-white dark:text-black hover:bg-black/80 font-bold text-xs shadow-sm"
-                        >
-                          <Key className="h-3.5 w-3.5 mr-1.5" />
-                          Connect via OAuth
-                        </Button>
-                      </a>
-                      <Button
-                        onClick={() => handleQuickConnect(platform)}
-                        disabled={loading}
-                        size="sm"
-                        className="rounded-xl bg-[#D8F85D] hover:bg-[#CCF046] text-[#18181B] font-bold text-xs shadow-sm"
-                      >
-                        <Sparkles className="h-3.5 w-3.5 mr-1.5" />
-                        1-Click Demo
-                      </Button>
-                    </div>
-                    <div className="text-right">
-                      <button
-                        type="button"
-                        onClick={() => openConnectModal(platform)}
-                        className="text-[11px] font-bold text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 underline underline-offset-2"
-                      >
-                        Manual Access Token &rarr;
-                      </button>
-                    </div>
+                  <div className="flex items-center justify-between text-[11px] font-semibold text-gray-400 pt-1">
+                    <span>Multi-account ready</span>
+                    <button
+                      type="button"
+                      onClick={() => openConnectModal(platform)}
+                      className="hover:text-gray-700 dark:hover:text-gray-200 underline underline-offset-2"
+                    >
+                      Manual Access Token &rarr;
+                    </button>
                   </div>
-                )}
+                </div>
               </div>
             </div>
           )

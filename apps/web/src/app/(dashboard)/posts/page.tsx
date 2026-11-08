@@ -79,11 +79,13 @@ export default function PostsPage() {
     setLoading(true)
     setMessage(null)
 
-    // Map platforms to accounts
-    const socialAccountIds: Record<string, string> = {}
+    // Map platforms to all connected accounts (multi-account blast)
+    const socialAccountIds: Record<string, string[]> = {}
     for (const platform of selectedPlatforms) {
-      const account = accounts.find((a: any) => a.platform === platform)
-      if (account) socialAccountIds[platform] = account.id
+      const platAccounts = accounts.filter((a: any) => a.platform === platform)
+      if (platAccounts.length) {
+        socialAccountIds[platform] = platAccounts.map((a: any) => a.id)
+      }
     }
 
     try {

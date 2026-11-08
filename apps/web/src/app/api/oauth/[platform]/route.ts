@@ -41,7 +41,7 @@ export async function GET(
       ].join(',')
       authUrl = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(
         redirectUri
-      )}&scope=${encodeURIComponent(scopes)}&state=${state}&response_type=code`
+      )}&scope=${encodeURIComponent(scopes)}&state=${state}&response_type=code&auth_type=rerequest`
       break
     }
 
@@ -63,7 +63,7 @@ export async function GET(
       ].join(',')
       authUrl = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(
         redirectUri
-      )}&scope=${encodeURIComponent(scopes)}&state=${state}&response_type=code`
+      )}&scope=${encodeURIComponent(scopes)}&state=${state}&response_type=code&auth_type=rerequest`
       break
     }
 
@@ -100,7 +100,7 @@ export async function GET(
         redirectUri
       )}&response_type=code&scope=${encodeURIComponent(
         scopes
-      )}&access_type=offline&prompt=consent&state=${state}`
+      )}&access_type=offline&prompt=select_account%20consent&state=${state}`
       break
     }
 
