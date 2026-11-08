@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 512">
+  <defs>
+    <linearGradient id="combBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#14171E" />
+      <stop offset="100%" stop-color="#0A0C0F" />
+    </linearGradient>
+    <linearGradient id="limeText" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D8F85D" />
+      <stop offset="100%" stop-color="#00D4D6" />
+    </linearGradient>
+    <filter id="combShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.5" />
+    </filter>
+  </defs>
+
+  <!-- Container -->
+  <rect width="1024" height="512" fill="url(#combBg)" rx="48" />
+
+  <!-- Left Icon Mark (360x360 within container) -->
+  <g id="icon" transform="translate(64, 76)" filter="url(#combShadow)">
+    <rect x="0" y="0" width="360" height="360" rx="90" fill="#1C212B" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="3" />
+
+    <!-- Bold 'M' with Broadcast Angles -->
+    <path d="M 72 280 L 72 130 C 72 105, 96 92, 115 108 L 180 170 L 245 108 C 264 92, 288 105, 288 130 L 288 280 L 236 280 L 236 170 L 180 222 L 124 170 L 124 280 Z" fill="#D8F85D" />
+
+    <!-- Forward Velocity Accents -->
+    <circle cx="180" cy="80" r="14" fill="#00D4D6" />
+    <circle cx="288" cy="80" r="10" fill="#A78BFA" />
+  </g>
+
+  <!-- Right Typography Wordmark -->
+  <g id="wordmark" transform="translate(480, 275)">
+    <!-- Brand Name -->
+    <text font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-weight="900" font-size="76" letter-spacing="2">
+      <tspan fill="#FFFFFF">MULTI</tspan>
+      <tspan fill="url(#limeText)">BLAST</tspan>
+    </text>
+
+    <!-- Tagline / Subtitle -->
+    <text y="54" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="600" font-size="20" fill="#8E99A8" letter-spacing="6">
+      OMNICHANNEL SOCIAL ENGINE
+    </text>
+
+    <!-- Platform Indicator Dots -->
+    <g transform="translate(4, 96)">
+      <circle cx="0" cy="0" r="7" fill="#1877F2" />
+      <circle cx="32" cy="0" r="7" fill="#E4405F" />
+      <circle cx="64" cy="0" r="7" fill="#00F2FE" />
+      <circle cx="96" cy="0" r="7" fill="#FF0000" />
+      <circle cx="128" cy="0" r="7" fill="#D8F85D" />
+    </g>
+  </g>
+</svg>

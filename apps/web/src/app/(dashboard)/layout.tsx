@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { MultiBlastLogo } from '@/components/logo'
 import { cn } from '@/lib/utils'
 import {
   LayoutGrid,
@@ -80,21 +81,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         >
           {/* Logo Brand */}
           <div className="flex h-16 items-center px-2 mb-4">
-            <Link href="/dashboard" className="flex items-center gap-3 group">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-black dark:bg-white text-white dark:text-black shadow-md transition-transform group-hover:scale-105">
-                {/* 8-Point Geometric Starline Star */}
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 0L13.8 8.2L22 6.4L15.8 12L22 17.6L13.8 15.8L12 24L10.2 15.8L2 17.6L8.2 12L2 6.4L10.2 8.2L12 0Z" />
-                </svg>
-              </div>
-              <div>
-                <span className="text-xl font-extrabold tracking-tight text-gray-900 dark:text-white font-sans">
-                  MultiBlast
-                </span>
-                <span className="block text-[10px] font-semibold text-gray-500 uppercase tracking-widest">
-                  Omnichannel SaaS
-                </span>
-              </div>
+            <Link href="/dashboard" className="group">
+              <MultiBlastLogo className="h-10 w-10" showText={true} />
             </Link>
             <button
               className="ml-auto rounded-full p-2 text-gray-600 hover:bg-black/5 lg:hidden"

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { MultiBlastLogo } from '@/components/logo'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -49,12 +50,7 @@ export default function LoginPage() {
 
         {/* Brand Header */}
         <div className="flex flex-col items-center text-center mb-6">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-black dark:bg-white text-white dark:text-black shadow-lg mb-4">
-            {/* 8-Point Geometric Star */}
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0L13.8 8.2L22 6.4L15.8 12L22 17.6L13.8 15.8L12 24L10.2 15.8L2 17.6L8.2 12L2 6.4L10.2 8.2L12 0Z" />
-            </svg>
-          </div>
+          <MultiBlastLogo className="h-16 w-16 mb-3" />
           <h1 className="text-2xl font-black tracking-tight text-gray-900 dark:text-white">
             MultiBlast
           </h1>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logo Preview — Concepts</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: 2rem;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  body.light { background: #f5f5f5; color: #333; }
+  body.dark { background: #1a1a1a; color: #eee; }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  h1 { font-size: 1.5rem; font-weight: 700; }
+  .subtitle { font-size: 0.875rem; color: #888; margin-top: 0.25rem; }
+  .toggle {
+    padding: 0.5rem 1rem;
+    border: 1px solid currentColor;
+    border-radius: 6px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font-size: 0.875rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+  .card {
+    border: 1px solid rgba(128, 128, 128, 0.3);
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .card-img {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    min-height: 260px;
+  }
+  body.light .card-img { background: #ffffff; }
+  body.dark .card-img { background: #13161c; }
+  .card-img img {
+    max-width: 100%;
+    max-height: 220px;
+    object-fit: contain;
+  }
+  .card-label {
+    padding: 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-top: 1px solid rgba(128, 128, 128, 0.2);
+  }
+  .card-desc {
+    padding: 0 1rem 1rem 1rem;
+    font-size: 0.8rem;
+    color: #888;
+    line-height: 1.4;
+  }
+  body.light .card-label { background: #fafafa; }
+  body.dark .card-label { background: #181b22; }
+  body.light .card-desc { background: #fafafa; }
+  body.dark .card-desc { background: #181b22; }
+
+  /* Meta icon size check */
+  .meta-check {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    border-radius: 16px;
+    border: 1px solid rgba(128, 128, 128, 0.25);
+  }
+  body.light .meta-check { background: #ffffff; }
+  body.dark .meta-check { background: #13161c; }
+  .meta-check h2 { font-size: 1.1rem; margin-bottom: 1rem; }
+  .size-row { display: flex; gap: 2rem; align-items: flex-end; flex-wrap: wrap; }
+  .size-item { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: #888; }
+</style>
+</head>
+<body class="dark">
+  <div class="header">
+    <div>
+      <h1>MultiBlast Logo Concepts</h1>
+      <div class="subtitle">Desain logo untuk Meta Developer App Review, favicon, & branding</div>
+    </div>
+    <button class="toggle" onclick="document.body.classList.toggle('dark'); document.body.classList.toggle('light'); this.textContent = document.body.classList.contains('dark') ? '☀️ Light' : '🌙 Dark';">☀️ Light</button>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-img">
+        <img src="concepts/concept-1.svg" alt="concept-1">
+      </div>
+      <div class="card-label">Concept 1: Geometric Multi-Beam 'M'</div>
+      <div class="card-desc">Huruf 'M' solid sudut presisi dengan neon lime &amp; cyan gradasi. 4 satelit node mewakili 4 kanal medsos (FB, IG, TikTok, YT). Sangat tajam di ukuran kecil.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-img">
+        <img src="concepts/concept-2.svg" alt="concept-2">
+      </div>
+      <div class="card-label">Concept 2: Claymorphic Radar Broadcast</div>
+      <div class="card-desc">Gaya tactile claymorphic dengan squircle gelap, 3 gelombang siaran konsentris (Cyan, Violet, Lime), dan core emitter. Vibe modern SaaS.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-img">
+        <img src="concepts/concept-3.svg" alt="concept-3">
+      </div>
+      <div class="card-label">Concept 3: Omnichannel Blast Starburst</div>
+      <div class="card-desc">Diamond core neon lime dengan 4 sayap energi directional dalam warna resmi 4 medsos (Merah YouTube, Pink IG, Toska TikTok, Biru FB).</div>
+    </div>
+
+    <div class="card">
+      <div class="card-img">
+        <img src="concepts/concept-4.svg" alt="concept-4">
+      </div>
+      <div class="card-label">Concept 4: Combination Mark (Icon + Wordmark)</div>
+      <div class="card-desc">Paket lengkap horizontal (1024x512). Ikon aplikasi squircle di kiri + tipografi bold modern MULTIBLAST &amp; tagline di kanan. Cocok untuk header landing page / docs.</div>
+    </div>
+  </div>
+
+  <div class="meta-check">
+    <h2>Meta App Icon Size Preview (Concept 1 &amp; 2)</h2>
+    <div class="size-row">
+      <div class="size-item">
+        <img src="concepts/concept-1.svg" width="128" height="128" style="border-radius:24px;">
+        <span>128px (Meta App Store)</span>
+      </div>
+      <div class="size-item">
+        <img src="concepts/concept-1.svg" width="64" height="64" style="border-radius:12px;">
+        <span>64px (Dashboard Avatar)</span>
+      </div>
+      <div class="size-item">
+        <img src="concepts/concept-1.svg" width="32" height="32" style="border-radius:6px;">
+        <span>32px (Favicon / Header)</span>
+      </div>
+      <div class="size-item">
+        <img src="concepts/concept-2.svg" width="128" height="128" style="border-radius:24px;">
+        <span>128px (Concept 2)</span>
+      </div>
+      <div class="size-item">
+        <img src="concepts/concept-2.svg" width="64" height="64" style="border-radius:12px;">
+        <span>64px (Concept 2)</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
