@@ -8,7 +8,8 @@ export async function GET(req: NextRequest) {
   const token = searchParams.get('hub.verify_token')
   const challenge = searchParams.get('hub.challenge')
 
-  if (mode === 'subscribe' && token === process.env.FACEBOOK_WEBHOOK_VERIFY_TOKEN) {
+  const verifyToken = process.env.FACEBOOK_WEBHOOK_VERIFY_TOKEN || 'multiblast_verify_token'
+  if (mode === 'subscribe' && token === verifyToken) {
     return new NextResponse(challenge, { status: 200 })
   }
   return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
