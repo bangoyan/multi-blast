@@ -113,24 +113,10 @@ export async function GET(
             }
           }
 
-          // Fallback if no business account attached to any page
+          // If no Instagram business account found attached to any page
           if (connectedIgCount === 0) {
-            const meRes = await fetch(
-              `https://graph.facebook.com/v19.0/me?fields=id,name&access_token=${userAccessToken}`
-            )
-            const me = await meRes.json()
-            await supabase.from('social_accounts').upsert(
-              {
-                user_id: user.id,
-                platform: 'instagram',
-                platform_user_id: me.id,
-                username: me.name?.replace(/\s+/g, '_').toLowerCase() || 'instagram_user',
-                access_token: userAccessToken,
-                metadata: {
-                  followers_count: 0,
-                },
-              },
-              { onConflict: 'user_id,platform,platform_user_id' }
+            return NextResponse.redirect(
+              `${origin}/accounts?error=no_instagram_business_found&platform=instagram`
             )
           }
         } else {

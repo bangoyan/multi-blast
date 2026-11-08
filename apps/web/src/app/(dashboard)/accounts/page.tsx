@@ -45,7 +45,12 @@ function AccountsContent() {
     if (success === 'connected' && platform) {
       setMessage({
         type: 'success',
-        text: `Successfully connected ${SOCIAL_META[platform as SocialPlatform]?.name || platform} via OAuth 2.0!`,
+        text: `Berhasil menghubungkan ${SOCIAL_META[platform as SocialPlatform]?.name || platform} via OAuth 2.0!`,
+      })
+    } else if (err === 'no_instagram_business_found') {
+      setMessage({
+        type: 'error',
+        text: 'Akun Instagram Bisnis/Kreator tidak ditemukan pada Halaman Facebook Anda. Pastikan: 1) Akun IG sudah diubah ke tipe Profesional (Bisnis/Kreator), 2) Akun IG sudah ditautkan ke Facebook Page di Pengaturan Instagram.',
       })
     } else if (err === 'missing_keys' && platform) {
       const platName = SOCIAL_META[platform as SocialPlatform]?.name || platform
