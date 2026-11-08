@@ -35,7 +35,6 @@ export async function GET(
       const scopes = [
         'public_profile',
         'pages_show_list',
-        'pages_read_engagement',
         'pages_manage_posts',
         'pages_messaging',
       ].join(',')
@@ -59,7 +58,6 @@ export async function GET(
         'instagram_manage_comments',
         'instagram_manage_messages',
         'pages_show_list',
-        'pages_read_engagement',
       ].join(',')
       authUrl = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(
         redirectUri
